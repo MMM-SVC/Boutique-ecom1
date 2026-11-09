@@ -1,0 +1,202 @@
+{
+  "accessibility": {
+    "skip_to_content": "Skip to content"
+  },
+  "general": {
+    "pagination": "Pagination",
+    "previous": "Previous",
+    "next": "Next",
+    "tagged": "Tagged “{{ tags }}”",
+    "page": "Page {{ page }}"
+  },
+  "header": {
+    "announcement": "Free shipping from €60 · Complimentary samples",
+    "menu": "Menu",
+    "search": "Search",
+    "account": "My account",
+    "cart_count": {
+      "one": "Cart ({{ count }} item)",
+      "other": "Cart ({{ count }} items)"
+    }
+  },
+  "footer": {
+    "tagline": "Exceptional skincare, carefully formulated to reveal your skin's beauty every day.",
+    "social": "Social media",
+    "instagram": "Instagram",
+    "facebook": "Facebook",
+    "tiktok": "TikTok",
+    "pinterest": "Pinterest",
+    "payment_methods": "Payment methods"
+  },
+  "home": {
+    "hero": {
+      "eyebrow": "New collection",
+      "heading": "The art of radiant skin",
+      "text": "Exceptional skincare with natural actives, formulated in France to reveal your skin's glow.",
+      "button": "Shop the collection",
+      "secondary_button": "Our story"
+    },
+    "features": {
+      "title_1": "Naturally derived actives",
+      "text_1": "Formulas with up to 98% naturally derived ingredients.",
+      "title_2": "Cruelty-free",
+      "text_2": "Ethical care that respects your skin and the planet.",
+      "title_3": "Free shipping",
+      "text_3": "From €60, carefully shipped within 48 hours."
+    },
+    "featured": {
+      "eyebrow": "Our essentials",
+      "heading": "Best sellers",
+      "view_all": "View all products"
+    },
+    "story": {
+      "eyebrow": "Our house",
+      "heading": "Beauty, uncompromised",
+      "text": "Every formula is born from a rigorous selection of precious actives and sensorial textures. We believe in honest, effective and respectful beauty, for rituals that feel good.",
+      "button": "Discover our story"
+    },
+    "testimonials": {
+      "eyebrow": "Customer reviews",
+      "heading": "Loved by our customers",
+      "summary": "4.9/5 · over 1,200 verified reviews",
+      "quote_1": "My skin has never looked so radiant. The texture is divine and the scent very delicate. I can't do without it!",
+      "author_1": "Camille R.",
+      "detail_1": "Radiance serum",
+      "quote_2": "A true luxury product: beautiful packaging, fast delivery and visible results from the first week.",
+      "author_2": "Sophie M.",
+      "detail_2": "Regenerating cream",
+      "quote_3": "I have sensitive skin and this is the first cream that doesn't cause any redness. Thank you!",
+      "author_3": "Léa D.",
+      "detail_3": "Cleansing balm"
+    },
+    "faq": {
+      "eyebrow": "FAQ",
+      "heading": "Frequently asked questions",
+      "text": "Can't find your answer? Our team is happy to help.",
+      "contact": "Contact us",
+      "question_1": "Are your products suitable for sensitive skin?",
+      "answer_1": "Yes. Our formulas are tested under dermatological supervision and designed to respect even the most reactive skin.",
+      "question_2": "How long does delivery take?",
+      "answer_2": "Orders are prepared within 24 hours and delivered in 2 to 4 business days in mainland France.",
+      "question_3": "Can I return a product?",
+      "answer_3": "You have 30 days to return an unopened product. Refunds are issued upon receipt.",
+      "question_4": "Are your products natural and vegan?",
+      "answer_4": "Our products contain up to 98% naturally derived ingredients and most of our formulas are vegan.",
+      "question_5": "How do I choose the right product for my skin?",
+      "answer_5": "Each product page lists the skin types it suits. You can also write to us: we will gladly advise you."
+    }
+  },
+  "newsletter": {
+    "heading": "Join the circle",
+    "text": "Get beauty tips, early access to new launches and 10% off your first order.",
+    "email": "Your email address",
+    "submit": "Subscribe",
+    "success": "Thank you! You're subscribed.",
+    "error": "Please enter a valid email address."
+  },
+  "reviews": {
+    "rating": "Rated {{ rating }} out of 5"
+  },
+  "products": {
+    "sale_price": "Sale price",
+    "regular_price": "Regular price",
+    "from_price": "From {{ price }}",
+    "sold_out": "Sold out",
+    "on_sale": "Sale",
+    "unavailable": "Unavailable",
+    "placeholder_title": "Product name",
+    "gallery": "Product gallery",
+    "swipe_hint": {
+      "one": "{{ count }} image",
+      "other": "Swipe · {{ count }} images"
+    },
+    "tax_included": "Tax included. Shipping calculated at checkout.",
+    "variant": "Variant",
+    "quantity": "Quantity",
+    "decrease": "Decrease quantity",
+    "increase": "Increase quantity",
+    "add_to_cart": "Add to cart",
+    "trust_shipping": "Carefully shipped within 48 hours",
+    "trust_payment": "100% secure payment",
+    "trust_natural": "Formulated in France, cruelty-free",
+    "description": "Description",
+    "ingredients": "Ingredients",
+    "usage": "How to use",
+    "shipping": "Shipping & returns",
+    "usage_default": "Apply morning and evening to clean, dry skin, gently massaging from the centre of the face outwards.",
+    "shipping_default": "Free shipping from €60. Ships within 48 hours. Free returns within 30 days for any unopened product.",
+    "related_heading": "You may also like"
+  },
+  "cart": {
+    "title": "Your cart",
+    "empty": "Your cart is empty.",
+    "continue_shopping": "Continue shopping",
+    "free_shipping_remaining_html": "Only <strong>{{ amount }}</strong> away from free shipping.",
+    "free_shipping_reached": "Congratulations, you get free shipping!",
+    "free_shipping_progress": "Progress towards free shipping",
+    "items": "Cart items",
+    "quantity_for": "Quantity for {{ title }}",
+    "remove": "Remove",
+    "summary": "Order summary",
+    "subtotal": "Subtotal",
+    "taxes_and_shipping": "Taxes included. Shipping and discount codes calculated at checkout.",
+    "note": "A note for us? (gift message, instructions…)",
+    "checkout": "Check out",
+    "update": "Update"
+  },
+  "collections": {
+    "title": "Collections",
+    "eyebrow": "Collection",
+    "product_count": {
+      "one": "{{ count }} product",
+      "other": "{{ count }} products"
+    },
+    "sort_by": "Sort by",
+    "apply": "Apply",
+    "empty": "No products in this collection yet."
+  },
+  "404": {
+    "title": "Error 404",
+    "not_found": "Page not found",
+    "text": "The page you are looking for doesn't exist or has moved.",
+    "back_to_shopping": "Back to shopping"
+  },
+  "blog": {
+    "article_comments": "Comments",
+    "article_metadata_html": "{{ date }} · {{ author }}",
+    "comment_form_body": "Comment",
+    "comment_form_email": "Email",
+    "comment_form_name": "Name",
+    "comment_form_submit": "Post",
+    "comment_form_title": "Add a comment"
+  },
+  "customers": {
+    "login": {
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign in",
+      "title": "Login"
+    }
+  },
+  "gift_card": {
+    "add_to_apple_wallet": "Add to Apple Wallet",
+    "card": "Gift card",
+    "expired": "This gift card has expired",
+    "expires_on": "Expires on {{ expires_on }}",
+    "use_at_checkout": "Use this gift card at checkout"
+  },
+  "password": {
+    "title": "Opening soon",
+    "password": "Password",
+    "enter": "Enter"
+  },
+  "search": {
+    "title": "Search",
+    "placeholder": "Search products, articles…",
+    "submit": "Search",
+    "no_results_html": "No results found for “{{ terms }}”",
+    "results_for_html": "{{ count }} results found for “{{ terms }}”",
+    "article": "Article",
+    "page": "Page"
+  }
+}

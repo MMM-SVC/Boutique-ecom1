@@ -1,7 +1,5 @@
 <h1 align="center" style="position: relative;">
   <br>
-    <img src="./assets/shoppy-x-ray.svg" alt="logo" width="200">
-  <br>
   Shopify Skeleton Theme
 </h1>
 
@@ -14,6 +12,25 @@ readily as by people.
   <a href="./LICENSE.md"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License"></a>
   <a href="./actions/workflows/ci.yml"><img alt="CI" src="https://github.com/Shopify/skeleton-theme/actions/workflows/ci.yml/badge.svg"></a>
 </p>
+
+## Guide de la boutique (FR)
+
+Thème luxe pour boutique de cosmétiques : fond crème, texte noir, accents dorés,
+titres à empattements. Textes de la boutique en français (`locales/fr.default.json`).
+
+**Personnaliser depuis l'éditeur Shopify** (Boutique en ligne → Thèmes → Personnaliser) :
+
+- **Paramètres du thème** : logo, favicon, couleurs, polices, arrondis, format des
+  images produit, seuil de livraison offerte, note de commande, liens réseaux sociaux.
+- **Accueil** : grande bannière, bandeau de réassurance, produits phares (choix de
+  la collection), image avec texte, avis clients, FAQ, newsletter.
+- **Produit** : marque, quantité, paiement express, engagements, textes
+  « Conseils d'utilisation » et « Livraison & retours ». L'onglet « Ingrédients »
+  apparaît si le métachamp produit `custom.ingredients` est rempli.
+- **En-tête / pied de page** : barre d'annonce, menus (`main-menu`, `footer`).
+
+Un champ de texte laissé vide affiche le texte par défaut. Pour changer ce texte
+par défaut partout : Boutique en ligne → Thèmes → … → Modifier le contenu par défaut.
 
 ## Getting started
 

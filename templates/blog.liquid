@@ -1,23 +1,39 @@
-{% block 'container' %}
-  <h1>{{ blog.title }}</h1>
+{% block 'container', class: 'page-section' %}
+  <div class="page-header page-header--center">
+    <h1>{{ blog.title | escape }}</h1>
+  </div>
 
-  {% paginate blog.articles by 5 %}
-    {% for article in blog.articles %}
-      <div>
-        {% if article.image %}
-          {{ article.image | image_url: width: 1000 | image_tag }}
-        {% endif %}
-        <h2>
-          {{ article.title | link_to: article.url }}
-        </h2>
-        {% assign date = article.published_at | time_tag: format: 'date' %}
-        <p>{{ 'blog.article_metadata_html' | t: date: date, author: article.author }}</p>
-        <p>{{ article.excerpt }}</p>
-      </div>
-    {% endfor %}
+  {% paginate blog.articles by 9 %}
+    <ul class="article-grid">
+      {% for article in blog.articles %}
+        <li class="article-card">
+          <a class="article-card__media" href="{{ article.url }}" tabindex="-1" aria-hidden="true">
+            {% if article.image %}
+              {{
+                article.image
+                | image_url: width: 900
+                | image_tag: loading: 'lazy', widths: '450, 600, 900', sizes: '(min-width: 990px) 33vw, 100vw', alt: ''
+              }}
+            {% else %}
+              {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}
+            {% endif %}
+          </a>
+          {% assign date = article.published_at | time_tag: format: 'date' %}
+          <p class="eyebrow">{{ 'blog.article_metadata_html' | t: date: date, author: article.author }}</p>
+          <h2 class="article-card__title">{{ article.title | escape | link_to: article.url }}</h2>
+          <p>{{ article.excerpt_or_content | strip_html | truncatewords: 25 }}</p>
+        </li>
+      {% endfor %}
+    </ul>
 
     {%- if paginate.pages > 1 -%}
-      {{- paginate | default_pagination -}}
+      <nav class="pagination" aria-label="{{ 'general.pagination' | t }}">
+        {%- liquid
+          assign previous_label = 'general.previous' | t
+          assign next_label = 'general.next' | t
+        -%}
+        {{ paginate | default_pagination: previous: previous_label, next: next_label }}
+      </nav>
     {%- endif -%}
   {% endpaginate %}
 {% endblock %}

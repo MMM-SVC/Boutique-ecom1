@@ -1,27 +1,29 @@
-{% block 'container' %}
-  <h1>{{ 'collections.title' | t }}</h1>
-
-  <div class="collections collections--full" style="--grid-gap: 10px">
-    {% for collection in collections %}
-      <a class="collection-card" href="{{ collection.url }}">
-        {% if collection.featured_image %}
-          {% render 'image',
-            class: 'collection-card__image',
-            image: collection.featured_image,
-            width: 600,
-            height: 600,
-            crop: 'center'
-          %}
-        {% endif %}
-
-        <div class="collection-card__content">
-          <p>{{ collection.title }}</p>
-
-          {% if collection.description %}
-            <p>{{ collection.description | strip_html | truncatewords: 15 }}</p>
-          {% endif %}
-        </div>
-      </a>
-    {% endfor %}
+{% block 'container', class: 'page-section' %}
+  <div class="page-header page-header--center">
+    <h1>{{ 'collections.title' | t }}</h1>
   </div>
+
+  <ul class="collection-grid">
+    {% for collection in collections %}
+      <li>
+        <a class="collection-card" href="{{ collection.url }}">
+          <div class="collection-card__media">
+            {% if collection.featured_image %}
+              {{
+                collection.featured_image
+                | image_url: width: 900
+                | image_tag: loading: 'lazy', widths: '450, 600, 900', sizes: '(min-width: 990px) 33vw, 50vw', alt: ''
+              }}
+            {% else %}
+              {{ 'collection-1' | placeholder_svg_tag: 'placeholder-svg' }}
+            {% endif %}
+          </div>
+          <div class="collection-card__content">
+            <h2 class="collection-card__title">{{ collection.title | escape }}</h2>
+            <p>{{ 'collections.product_count' | t: count: collection.products_count }}</p>
+          </div>
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
 {% endblock %}

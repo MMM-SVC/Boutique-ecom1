@@ -1,0 +1,78 @@
+{% doc %}
+  Product card used in grids (home, collection, search, related products).
+  Shows the featured image (with an optional second image on hover), sale /
+  sold-out badges, vendor, title and price. Renders a placeholder card when
+  `product` is blank.
+
+  @param {product} [product] - The product to display. Blank renders a placeholder.
+  @param {number} [index] - Placeholder illustration number (1-6).
+  @param {boolean} [eager] - Load the image eagerly (above-the-fold cards).
+
+  @example
+  {% render 'product-card', product: product %}
+{% enddoc %}
+
+{%- liquid
+  assign loading = 'lazy'
+  if eager
+    assign loading = 'eager'
+  endif
+  assign sizes = '(min-width: 990px) 25vw, 50vw'
+-%}
+
+{% if product != blank %}
+  <article class="product-card">
+    <a class="product-card__media" href="{{ product.url }}" tabindex="-1" aria-hidden="true">
+      {% if product.featured_media %}
+        {{
+          product.featured_media
+          | image_url: width: 900
+          | image_tag:
+            class: 'product-card__image',
+            loading: loading,
+            widths: '300, 450, 600, 900',
+            sizes: sizes,
+            alt: product.featured_media.alt
+        }}
+        {% if settings.show_secondary_image and product.media.size > 1 %}
+          {{
+            product.media[1]
+            | image_url: width: 900
+            | image_tag:
+              class: 'product-card__image product-card__image--secondary',
+              loading: 'lazy',
+              widths: '300, 450, 600, 900',
+              sizes: sizes,
+              alt: ''
+          }}
+        {% endif %}
+      {% else %}
+        {{ 'product-1' | placeholder_svg_tag: 'product-card__placeholder' }}
+      {% endif %}
+
+      {% if product.available == false %}
+        <span class="badge badge--muted">{{ 'products.sold_out' | t }}</span>
+      {% elsif product.compare_at_price > product.price %}
+        <span class="badge badge--sale">{{ 'products.on_sale' | t }}</span>
+      {% endif %}
+    </a>
+
+    <div class="product-card__info">
+      <h3 class="product-card__title">
+        <a href="{{ product.url }}">{{ product.title | escape }}</a>
+      </h3>
+      {% render 'price', product: product %}
+    </div>
+  </article>
+{% else %}
+  {%- assign placeholder_name = 'product-' | append: index -%}
+  <article class="product-card product-card--placeholder">
+    <div class="product-card__media">
+      {{ placeholder_name | placeholder_svg_tag: 'product-card__placeholder' }}
+    </div>
+    <div class="product-card__info">
+      <h3 class="product-card__title">{{ 'products.placeholder_title' | t }}</h3>
+      <div class="price"><span class="price__current">{{ 4900 | money }}</span></div>
+    </div>
+  </article>
+{% endif %}

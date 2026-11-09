@@ -72,8 +72,7 @@ to use `block.settings.<id>` for schema-backed controls in block implementations
 `{% doc %}` documents parameters; it does not declare, validate, or bind them.
 A parameter documented only in LiquidDoc is read as a plain variable and does
 not become a schema setting. Use `{% schema %}` for merchant-editable controls.
-Inline literal arrays are supported in `{% block %}` arguments, as shown by
-`tips` in `templates/index.liquid`; `{% render %}` and `{% partial %}` do not
+Inline literal arrays are supported in `{% block %}` arguments; `{% render %}` and `{% partial %}` do not
 accept inline literal arrays.
 
 The content between `{% block %}` and `{% endblock %}` is available inside the
@@ -99,10 +98,9 @@ Partials name inline regions of server-rendered HTML. JavaScript can request a
 region by name and replace the matching region in the DOM. The name in the
 Liquid template and the name in JavaScript must match.
 
-The `liquid-tips` block is the theme's canonical partial-refresh example: its
-tip sentence lives in a `{% partial 'liquid-tip' %}` region, and
-`assets/liquid-tips.js` calls `partials.refresh("liquid-tip")` to swap in a
-fresh server-rendered tip. Import `partials` from
+The theme currently ships no `{% partial %}` region (the former `liquid-tips`
+demo was removed so the storefront never depends on the feature flag below).
+When adding one, import `partials` from
 `@shopify/partial-rendering`. Use `refresh()` to fetch and apply regions from
 the current page URL, or `fetch()` followed by `apply()` when you need control
 over the request URL, method, body, or when the update appears. Fetch related
@@ -143,15 +141,22 @@ Skeleton keeps `.theme-check.yml` as a pristine
 `extends: theme-check:recommended` with **zero overrides**. Fix Theme Check
 errors in the Liquid instead of adding configuration exceptions.
 
-Current blocks: `container`, `hello-world`, `header`, `footer`,
-`liquid-tips`.
+Current blocks: `container`, `header`, `footer`, `hero`, `features`,
+`featured-products`, `image-with-text`, `testimonials`, `testimonial`, `faq`,
+`faq-item`, `newsletter`, `product-main`, `related-products`.
+
+Merchant-editable text follows one pattern: the schema setting has no
+default, and the block falls back to a translation (`{{ 'key' | t }}`) when the
+setting is blank. Repeated child blocks (`testimonial`, `faq-item`) receive
+their fallback translation keys as `default_*` parameters from the template.
+The storefront default locale is French (`locales/fr.default.json`).
 
 ## Theme map
 
 ```
-blocks/               container, hello-world, header, footer, liquid-tips
+blocks/               container, header, footer, home-page blocks, product blocks
 templates/            *.liquid page structure (no JSON templates)
 layout/               theme.liquid document shell: header/footer container blocks + <main>
-snippets/             internal utilities (css-variables, image, meta-tags)
+snippets/             internal utilities (css-variables, meta-tags, price, product-card, stars)
 assets/               CSS, JavaScript, and other static assets
 ```

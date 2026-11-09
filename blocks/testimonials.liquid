@@ -1,0 +1,90 @@
+{% doc %}
+  Customer reviews band: heading, optional average-rating summary and a grid
+  (a swipeable row on mobile) of `testimonial` blocks passed as body content.
+
+  @param {string} content - The `testimonial` blocks to display.
+
+  @example
+  {% block 'testimonials' %}
+    {% block 'testimonial', default_quote: 'home.testimonials.quote_1', default_author: 'home.testimonials.author_1' %}{% endblock %}
+  {% endblock %}
+{% enddoc %}
+
+{%- liquid
+  assign eyebrow = 'home.testimonials.eyebrow' | t
+  if block.settings.eyebrow != blank
+    assign eyebrow = block.settings.eyebrow
+  endif
+
+  assign heading = 'home.testimonials.heading' | t
+  if block.settings.heading != blank
+    assign heading = block.settings.heading
+  endif
+
+  assign summary = 'home.testimonials.summary' | t
+  if block.settings.summary != blank
+    assign summary = block.settings.summary
+  endif
+-%}
+
+<div class="testimonials band band--{{ block.settings.color_scheme }} full-width" {{ block.shopify_attributes }}>
+  <div class="band__inner">
+    <div class="section-heading">
+      <p class="eyebrow">{{ eyebrow | escape }}</p>
+      <h2>{{ heading | escape }}</h2>
+      {% if block.settings.show_summary %}
+        <p class="testimonials__summary">
+          {% render 'stars', rating: 5 %}
+          <span>{{ summary | escape }}</span>
+        </p>
+      {% endif %}
+    </div>
+
+    <ul class="testimonials__list" role="list">
+      {{ content }}
+    </ul>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:general.testimonials",
+  "settings": [
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "t:labels.color_scheme",
+      "options": [
+        { "value": "default", "label": "t:options.color_scheme.default" },
+        { "value": "secondary", "label": "t:options.color_scheme.secondary" },
+        { "value": "inverse", "label": "t:options.color_scheme.inverse" }
+      ],
+      "default": "secondary"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "t:labels.eyebrow",
+      "info": "t:info.default_text"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:labels.heading",
+      "info": "t:info.default_text"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_summary",
+      "label": "t:labels.show_rating_summary",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "summary",
+      "label": "t:labels.rating_summary",
+      "info": "t:info.default_text"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,90 @@
+{% doc %}
+  One customer review card (stars, quote, author, detail). Used inside the
+  `testimonials` block. Each text is editable in the theme editor; empty
+  fields fall back to the translation keys passed by the template.
+
+  @param {string} [default_quote] - Translation key of the default quote.
+  @param {string} [default_author] - Translation key of the default author name.
+  @param {string} [default_detail] - Translation key of the default detail line (e.g. product bought).
+  @param {string} [content] - Optional extra markup rendered inside the block. Usually left empty.
+
+  @example
+  {% block 'testimonial', default_quote: 'home.testimonials.quote_1', default_author: 'home.testimonials.author_1', default_detail: 'home.testimonials.detail_1' %}{% endblock %}
+{% enddoc %}
+
+{%- liquid
+  assign quote = ''
+  if default_quote
+    assign quote = default_quote | t
+  endif
+  if block.settings.quote != blank
+    assign quote = block.settings.quote
+  endif
+
+  assign author = ''
+  if default_author
+    assign author = default_author | t
+  endif
+  if block.settings.author != blank
+    assign author = block.settings.author
+  endif
+
+  assign detail = ''
+  if default_detail
+    assign detail = default_detail | t
+  endif
+  if block.settings.detail != blank
+    assign detail = block.settings.detail
+  endif
+-%}
+
+<li class="testimonial" {{ block.shopify_attributes }}>
+  <figure>
+    {% render 'stars', rating: block.settings.rating %}
+    <blockquote class="testimonial__quote">
+      <p>{{ quote | escape }}</p>
+    </blockquote>
+    <figcaption class="testimonial__author">
+      <span class="testimonial__name">{{ author | escape }}</span>
+      {% if detail != blank %}
+        <span class="testimonial__detail">{{ detail | escape }}</span>
+      {% endif %}
+      {{ content }}
+    </figcaption>
+  </figure>
+</li>
+
+{% schema %}
+{
+  "name": "t:general.testimonial",
+  "settings": [
+    {
+      "type": "range",
+      "id": "rating",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "label": "t:labels.rating",
+      "default": 5
+    },
+    {
+      "type": "textarea",
+      "id": "quote",
+      "label": "t:labels.quote",
+      "info": "t:info.default_text"
+    },
+    {
+      "type": "text",
+      "id": "author",
+      "label": "t:labels.author",
+      "info": "t:info.default_text"
+    },
+    {
+      "type": "text",
+      "id": "detail",
+      "label": "t:labels.detail",
+      "info": "t:info.default_text"
+    }
+  ]
+}
+{% endschema %}

@@ -1,27 +1,85 @@
 {% doc %}
-  Renders the theme's storefront footer: copyright line, footer menu,
-  and optional payment icons. Composed directly in layout/theme.liquid
-  so it appears on every page.
+  Renders the storefront footer: brand statement, two link menus, social
+  links (from the theme settings), payment icons and copyright line.
+  Composed directly in layout/theme.liquid so it appears on every page.
+
+  @param {string} [content] - Optional extra markup rendered inside the block. Usually left empty.
 {% enddoc %}
 
-<footer {{ block.shopify_attributes }}>
-  <div class="footer__copyright">
-    &copy;
-    {{ 'now' | date: '%Y' }}
-    {{ shop.name | link_to: routes.root_url }}, {{ powered_by_link }}
+{%- liquid
+  assign tagline = 'footer.tagline' | t
+  if block.settings.tagline != blank
+    assign tagline = block.settings.tagline
+  endif
+-%}
+
+<footer class="footer full-width" {{ block.shopify_attributes }}>
+  <div class="footer__inner">
+    <div class="footer__brand">
+      <a class="footer__logo" href="{{ routes.root_url }}">{{ shop.name | escape }}</a>
+      <p>{{ tagline | escape }}</p>
+
+      {%- liquid
+        assign has_social = false
+        if settings.social_instagram != blank or settings.social_facebook != blank or settings.social_tiktok != blank or settings.social_pinterest != blank
+          assign has_social = true
+        endif
+      -%}
+      {% if has_social %}
+        <ul class="footer__social" aria-label="{{ 'footer.social' | t }}">
+          {% if settings.social_instagram != blank %}
+            <li><a href="{{ settings.social_instagram }}" target="_blank" rel="noopener">{{ 'footer.instagram' | t }}</a></li>
+          {% endif %}
+          {% if settings.social_facebook != blank %}
+            <li><a href="{{ settings.social_facebook }}" target="_blank" rel="noopener">{{ 'footer.facebook' | t }}</a></li>
+          {% endif %}
+          {% if settings.social_tiktok != blank %}
+            <li><a href="{{ settings.social_tiktok }}" target="_blank" rel="noopener">{{ 'footer.tiktok' | t }}</a></li>
+          {% endif %}
+          {% if settings.social_pinterest != blank %}
+            <li><a href="{{ settings.social_pinterest }}" target="_blank" rel="noopener">{{ 'footer.pinterest' | t }}</a></li>
+          {% endif %}
+        </ul>
+      {% endif %}
+    </div>
+
+    {% if block.settings.menu.links.size > 0 %}
+      <nav class="footer__column" aria-label="{{ block.settings.menu.title | escape }}">
+        <p class="footer__heading">{{ block.settings.menu.title | escape }}</p>
+        <ul>
+          {% for link in block.settings.menu.links %}
+            <li>{{ link.title | escape | link_to: link.url }}</li>
+          {% endfor %}
+        </ul>
+      </nav>
+    {% endif %}
+
+    {% if block.settings.secondary_menu.links.size > 0 %}
+      <nav class="footer__column" aria-label="{{ block.settings.secondary_menu.title | escape }}">
+        <p class="footer__heading">{{ block.settings.secondary_menu.title | escape }}</p>
+        <ul>
+          {% for link in block.settings.secondary_menu.links %}
+            <li>{{ link.title | escape | link_to: link.url }}</li>
+          {% endfor %}
+        </ul>
+      </nav>
+    {% endif %}
+
+    {{ content }}
   </div>
 
-  <div class="footer__links">
-    {% for link in block.settings.menu.links %}
-      {{ link.title | link_to: link.url }}
-    {% endfor %}
-  </div>
+  <div class="footer__bottom">
+    <p class="footer__copyright">
+      &copy; {{ 'now' | date: '%Y' }}
+      {{ shop.name | escape | link_to: routes.root_url }} · {{ powered_by_link }}
+    </p>
 
-  <div class="footer__payment">
     {% if block.settings.show_payment_icons %}
-      {% for type in shop.enabled_payment_types %}
-        {{ type | payment_type_svg_tag }}
-      {% endfor %}
+      <ul class="footer__payment" aria-label="{{ 'footer.payment_methods' | t }}">
+        {% for type in shop.enabled_payment_types %}
+          <li>{{ type | payment_type_svg_tag }}</li>
+        {% endfor %}
+      </ul>
     {% endif %}
   </div>
 </footer>
@@ -31,9 +89,21 @@
   "name": "t:general.footer",
   "settings": [
     {
+      "type": "textarea",
+      "id": "tagline",
+      "label": "t:labels.tagline",
+      "info": "t:info.default_text"
+    },
+    {
       "type": "link_list",
       "id": "menu",
-      "label": "t:labels.menu"
+      "label": "t:labels.menu",
+      "default": "footer"
+    },
+    {
+      "type": "link_list",
+      "id": "secondary_menu",
+      "label": "t:labels.secondary_menu"
     },
     {
       "type": "checkbox",

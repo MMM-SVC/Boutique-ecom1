@@ -1,0 +1,124 @@
+{% doc %}
+  "Best sellers" grid: shows products from a collection chosen in the theme
+  editor (falls back to all products, then to placeholder cards on a store
+  with no products yet), with a heading and a "view all" link.
+
+  @param {string} [content] - Optional extra markup rendered inside the block. Usually left empty.
+
+  @example
+  {% block 'featured-products' %}{% endblock %}
+{% enddoc %}
+
+{%- liquid
+  assign eyebrow = 'home.featured.eyebrow' | t
+  if block.settings.eyebrow != blank
+    assign eyebrow = block.settings.eyebrow
+  endif
+
+  assign heading = 'home.featured.heading' | t
+  if block.settings.heading != blank
+    assign heading = block.settings.heading
+  endif
+
+  assign source = block.settings.collection
+  if source == blank
+    assign source = collections.all
+  endif
+  assign view_all_url = source.url | default: routes.all_products_collection_url
+  assign limit = block.settings.products_to_show
+-%}
+
+<div class="featured-products band band--{{ block.settings.color_scheme }} full-width" {{ block.shopify_attributes }}>
+  <div class="band__inner">
+    <div class="section-heading">
+      <p class="eyebrow">{{ eyebrow | escape }}</p>
+      <h2>{{ heading | escape }}</h2>
+    </div>
+
+    <ul class="product-grid product-grid--{{ block.settings.columns }}">
+      {% if source.products_count > 0 %}
+        {% for product in source.products limit: limit %}
+          <li>{% render 'product-card', product: product %}</li>
+        {% endfor %}
+      {% else %}
+        {% for i in (1..limit) %}
+          {%- assign placeholder_index = i | modulo: 6 | plus: 1 -%}
+          <li>{% render 'product-card', product: blank, index: placeholder_index %}</li>
+        {% endfor %}
+      {% endif %}
+    </ul>
+
+    {% if block.settings.show_view_all %}
+      <div class="section-footer">
+        <a class="button button--outline" href="{{ view_all_url }}">{{ 'home.featured.view_all' | t }}</a>
+      </div>
+    {% endif %}
+    {{ content }}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:general.featured_products",
+  "settings": [
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "t:labels.collection",
+      "info": "t:info.featured_collection"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "label": "t:labels.products_to_show",
+      "default": 4
+    },
+    {
+      "type": "select",
+      "id": "columns",
+      "label": "t:labels.columns_desktop",
+      "options": [
+        { "value": "3", "label": "3" },
+        { "value": "4", "label": "4" }
+      ],
+      "default": "4"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "t:labels.show_view_all",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "t:labels.color_scheme",
+      "options": [
+        { "value": "default", "label": "t:options.color_scheme.default" },
+        { "value": "secondary", "label": "t:options.color_scheme.secondary" },
+        { "value": "inverse", "label": "t:options.color_scheme.inverse" }
+      ],
+      "default": "default"
+    },
+    {
+      "type": "header",
+      "content": "t:general.content"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "t:labels.eyebrow",
+      "info": "t:info.default_text"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:labels.heading",
+      "info": "t:info.default_text"
+    }
+  ]
+}
+{% endschema %}

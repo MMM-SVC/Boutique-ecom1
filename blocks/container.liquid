@@ -4,6 +4,8 @@
   layout element and renders the composed body via {{ content }}.
 
   @param {string} [tag] - HTML element for the wrapper. Default: 'section'.
+  @param {string} [class] - Extra CSS classes added to the wrapper.
+  @param {string} [content] - Composed page content rendered inside the wrapper.
 
   @example Default section wrapper
   {% block 'container' %}
@@ -12,14 +14,18 @@
   {% endblock %}
 
   @example Override the wrapper element
-  {% block 'container', tag: 'div' %}
+  {% block 'container', tag: 'div', class: 'site-header' %}
     ...
   {% endblock %}
 {% enddoc %}
 
 {%- assign tag = tag | default: 'section' -%}
 
-<{{ tag }} class="block-container" style="--text-align: {{ block.settings.alignment }};" {{ block.shopify_attributes }}>
+<{{ tag }}
+  class="block-container {{ class }}"
+  style="--text-align: {{ block.settings.alignment }};"
+  {{ block.shopify_attributes }}
+>
   {{ content }}
 </{{ tag }}>
 

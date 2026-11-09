@@ -1,0 +1,61 @@
+{% doc %}
+  One FAQ question/answer rendered as an accessible <details> accordion.
+  Used inside the `faq` block. Empty settings fall back to the translation
+  keys passed by the template.
+
+  @param {string} [default_question] - Translation key of the default question.
+  @param {string} [default_answer] - Translation key of the default answer.
+  @param {string} [content] - Optional extra markup rendered inside the block. Usually left empty.
+
+  @example
+  {% block 'faq-item', default_question: 'home.faq.question_1', default_answer: 'home.faq.answer_1' %}{% endblock %}
+{% enddoc %}
+
+{%- liquid
+  assign question = ''
+  if default_question
+    assign question = default_question | t
+  endif
+  if block.settings.question != blank
+    assign question = block.settings.question
+  endif
+
+  assign answer = ''
+  if default_answer
+    assign answer = default_answer | t | escape | prepend: '<p>' | append: '</p>'
+  endif
+  if block.settings.answer != blank
+    assign answer = block.settings.answer
+  endif
+-%}
+
+<details class="accordion" {{ block.shopify_attributes }}>
+  <summary class="accordion__summary">
+    <span>{{ question | escape }}</span>
+    <span class="accordion__icon" aria-hidden="true"></span>
+  </summary>
+  <div class="accordion__content rte">
+    {{ answer }}
+    {{ content }}
+  </div>
+</details>
+
+{% schema %}
+{
+  "name": "t:general.faq_item",
+  "settings": [
+    {
+      "type": "text",
+      "id": "question",
+      "label": "t:labels.question",
+      "info": "t:info.default_text"
+    },
+    {
+      "type": "richtext",
+      "id": "answer",
+      "label": "t:labels.answer",
+      "info": "t:info.default_text"
+    }
+  ]
+}
+{% endschema %}

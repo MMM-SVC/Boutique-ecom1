@@ -1,0 +1,47 @@
+{% doc %}
+  Renders a product or variant price, with the compare-at price struck
+  through when the item is on sale.
+
+  @param {product} [product] - Product whose price range is shown.
+  @param {variant} [variant] - Variant whose exact price is shown (takes precedence).
+  @param {string} [class] - Extra CSS classes for the wrapper.
+
+  @example
+  {% render 'price', product: product %}
+  {% render 'price', variant: product.selected_or_first_available_variant %}
+{% enddoc %}
+
+{%- liquid
+  if variant
+    assign price = variant.price
+    assign compare_at = variant.compare_at_price
+    assign varies = false
+  else
+    assign price = product.price
+    assign compare_at = product.compare_at_price
+    assign varies = product.price_varies
+  endif
+
+  assign price_formatted = price | money
+  assign on_sale = false
+  if compare_at > price
+    assign on_sale = true
+  endif
+-%}
+
+<div class="price {% if on_sale %}price--sale{% endif %} {{ class }}">
+  {% if on_sale %}
+    <span class="visually-hidden">{{ 'products.sale_price' | t }}</span>
+  {% endif %}
+  <span class="price__current">
+    {%- if varies -%}
+      {{ 'products.from_price' | t: price: price_formatted }}
+    {%- else -%}
+      {{ price_formatted }}
+    {%- endif -%}
+  </span>
+  {% if on_sale %}
+    <span class="visually-hidden">{{ 'products.regular_price' | t }}</span>
+    <s class="price__compare">{{ compare_at | money }}</s>
+  {% endif %}
+</div>

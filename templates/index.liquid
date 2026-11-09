@@ -1,5 +1,49 @@
 {% block 'container' %}
-  {% block 'hello-world' %}
-    {% block 'liquid-tips', tips: ['hello_world.liquid_tips_1', 'hello_world.liquid_tips_2', 'hello_world.liquid_tips_3'] %}{% endblock %}
+  {% block 'hero' %}{% endblock %}
+{% endblock %}
+
+{% block 'container' %}
+  {% block 'features' %}{% endblock %}
+{% endblock %}
+
+{% block 'container' %}
+  {% block 'featured-products' %}{% endblock %}
+{% endblock %}
+
+{% block 'container' %}
+  {% block 'image-with-text' %}{% endblock %}
+{% endblock %}
+
+{% block 'container' %}
+  {% block 'testimonials' %}
+    {% block 'testimonial',
+      default_quote: 'home.testimonials.quote_1',
+      default_author: 'home.testimonials.author_1',
+      default_detail: 'home.testimonials.detail_1'
+    %}{% endblock %}
+    {% block 'testimonial',
+      default_quote: 'home.testimonials.quote_2',
+      default_author: 'home.testimonials.author_2',
+      default_detail: 'home.testimonials.detail_2'
+    %}{% endblock %}
+    {% block 'testimonial',
+      default_quote: 'home.testimonials.quote_3',
+      default_author: 'home.testimonials.author_3',
+      default_detail: 'home.testimonials.detail_3'
+    %}{% endblock %}
   {% endblock %}
+{% endblock %}
+
+{% block 'container' %}
+  {% block 'faq' %}
+    {% block 'faq-item', default_question: 'home.faq.question_1', default_answer: 'home.faq.answer_1' %}{% endblock %}
+    {% block 'faq-item', default_question: 'home.faq.question_2', default_answer: 'home.faq.answer_2' %}{% endblock %}
+    {% block 'faq-item', default_question: 'home.faq.question_3', default_answer: 'home.faq.answer_3' %}{% endblock %}
+    {% block 'faq-item', default_question: 'home.faq.question_4', default_answer: 'home.faq.answer_4' %}{% endblock %}
+    {% block 'faq-item', default_question: 'home.faq.question_5', default_answer: 'home.faq.answer_5' %}{% endblock %}
+  {% endblock %}
+{% endblock %}
+
+{% block 'container' %}
+  {% block 'newsletter' %}{% endblock %}
 {% endblock %}

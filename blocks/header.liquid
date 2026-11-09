@@ -1,45 +1,137 @@
 {% doc %}
-  Renders the theme's storefront header: shop title, main menu,
-  customer account entry, and cart link. Composed directly in
-  layout/theme.liquid so it wraps every page.
+  Renders the storefront header: optional announcement bar, mobile menu
+  drawer, logo (or shop name), main menu, search, customer account and cart
+  links. Composed directly in layout/theme.liquid so it wraps every page.
+
+  @param {string} [content] - Optional extra markup rendered inside the block. Usually left empty.
 {% enddoc %}
 
-<header {{ block.shopify_attributes }}>
-  <h2 class="header__title">
-    {{ shop.name | link_to: routes.root_url }}
-  </h2>
+{%- liquid
+  assign announcement = 'header.announcement' | t
+  if block.settings.announcement_text != blank
+    assign announcement = block.settings.announcement_text
+  endif
+-%}
 
-  <div class="header__menu">
-    {% for link in block.settings.menu.links %}
-      {{ link.title | link_to: link.url }}
-    {% endfor %}
-  </div>
+<div class="header-wrapper full-width" {{ block.shopify_attributes }}>
+  {% if block.settings.show_announcement %}
+    <div class="announcement-bar">
+      {% if block.settings.announcement_link != blank %}
+        <a href="{{ block.settings.announcement_link }}">{{ announcement | escape }}</a>
+      {% else %}
+        <p>{{ announcement | escape }}</p>
+      {% endif %}
+    </div>
+  {% endif %}
 
-  <div class="header__icons">
-    {% if shop.customer_accounts_enabled %}
-      <shopify-account menu="{{ block.settings.customer_account_menu }}">
-        {{ 'icon-account.svg' | inline_asset_content }}
-      </shopify-account>
-    {% endif %}
+  <header class="header">
+    <details class="menu-drawer" scroll-lock>
+      <summary class="header__icon" aria-label="{{ 'header.menu' | t }}">
+        <span class="menu-drawer__open">{{ 'icon-menu.svg' | inline_asset_content }}</span>
+        <span class="menu-drawer__close">{{ 'icon-close.svg' | inline_asset_content }}</span>
+      </summary>
+      <nav class="menu-drawer__panel" aria-label="{{ 'header.menu' | t }}">
+        <ul class="menu-drawer__list">
+          {% for link in block.settings.menu.links %}
+            <li>
+              <a href="{{ link.url }}" {% if link.active %}aria-current="page"{% endif %}>{{ link.title | escape }}</a>
+              {% if link.links.size > 0 %}
+                <ul class="menu-drawer__sublist">
+                  {% for child in link.links %}
+                    <li><a href="{{ child.url }}">{{ child.title | escape }}</a></li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+        <div class="menu-drawer__footer">
+          <a href="{{ routes.search_url }}">{{ 'header.search' | t }}</a>
+          {% if shop.customer_accounts_enabled %}
+            <a href="{{ routes.account_url }}">{{ 'header.account' | t }}</a>
+          {% endif %}
+        </div>
+      </nav>
+    </details>
 
-    <a href="{{ routes.cart_url }}">
-      {% if cart.item_count > 0 %}
-        <sup>{{ cart.item_count }}</sup>
+    <a class="header__logo" href="{{ routes.root_url }}">
+      {% if settings.logo %}
+        {{
+          settings.logo
+          | image_url: width: 600
+          | image_tag: alt: shop.name, widths: '150, 300, 600', sizes: 'var(--logo-width)'
+        }}
+      {% else %}
+        <span class="header__shop-name">{{ shop.name | escape }}</span>
+      {% endif %}
+    </a>
+
+    <nav class="header__menu" aria-label="{{ 'header.menu' | t }}">
+      <ul>
+        {% for link in block.settings.menu.links %}
+          <li>
+            <a href="{{ link.url }}" {% if link.active %}aria-current="page"{% endif %}>{{ link.title | escape }}</a>
+          </li>
+        {% endfor %}
+      </ul>
+    </nav>
+
+    <div class="header__icons">
+      <a class="header__icon header__icon--search" href="{{ routes.search_url }}" aria-label="{{ 'header.search' | t }}">
+        {{ 'icon-search.svg' | inline_asset_content }}
+      </a>
+
+      {% if shop.customer_accounts_enabled %}
+        <shopify-account class="header__icon header__icon--account" menu="{{ block.settings.customer_account_menu }}">
+          {{ 'icon-account.svg' | inline_asset_content }}
+        </shopify-account>
       {% endif %}
 
-      {{ 'icon-cart.svg' | inline_asset_content }}
-    </a>
-  </div>
-</header>
+      <a class="header__icon header__cart" href="{{ routes.cart_url }}" aria-label="{{ 'header.cart_count' | t: count: cart.item_count }}">
+        {{ 'icon-cart.svg' | inline_asset_content }}
+        {% if cart.item_count > 0 %}
+          <span class="header__cart-count" aria-hidden="true">{{ cart.item_count }}</span>
+        {% endif %}
+      </a>
+      {{ content }}
+    </div>
+  </header>
+</div>
 
 {% schema %}
 {
   "name": "t:general.header",
   "settings": [
     {
+      "type": "header",
+      "content": "t:general.announcement"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_announcement",
+      "label": "t:labels.show_announcement",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "announcement_text",
+      "label": "t:labels.text",
+      "info": "t:info.default_text"
+    },
+    {
+      "type": "url",
+      "id": "announcement_link",
+      "label": "t:labels.link"
+    },
+    {
+      "type": "header",
+      "content": "t:general.navigation"
+    },
+    {
       "type": "link_list",
       "id": "menu",
-      "label": "t:labels.menu"
+      "label": "t:labels.menu",
+      "default": "main-menu"
     },
     {
       "type": "link_list",

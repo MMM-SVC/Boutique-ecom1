@@ -1,0 +1,85 @@
+{% doc %}
+  "You may also like" grid on the product page: products from the current
+  product's first collection (or from a collection chosen in the editor),
+  excluding the product itself. Hidden when there is nothing to show.
+
+  @param {string} [content] - Optional extra markup rendered inside the block. Usually left empty.
+
+  @example
+  {% block 'related-products' %}{% endblock %}
+{% enddoc %}
+
+{%- liquid
+  assign heading = 'products.related_heading' | t
+  if block.settings.heading != blank
+    assign heading = block.settings.heading
+  endif
+
+  assign source = block.settings.collection
+  if source == blank
+    assign source = product.collections.first
+  endif
+  assign limit = block.settings.products_to_show
+  assign shown = 0
+-%}
+
+{% if source != blank and source.products_count > 1 %}
+  <div class="related-products band band--{{ block.settings.color_scheme }} full-width" {{ block.shopify_attributes }}>
+    <div class="band__inner">
+      <div class="section-heading">
+        <h2>{{ heading | escape }}</h2>
+      </div>
+      <ul class="product-grid product-grid--4">
+        {% for item in source.products limit: 13 %}
+          {% if item.id != product.id and shown < limit %}
+            {%- assign shown = shown | plus: 1 -%}
+            <li>{% render 'product-card', product: item %}</li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+      {{ content }}
+    </div>
+  </div>
+{% else %}
+  <div hidden {{ block.shopify_attributes }}></div>
+{% endif %}
+
+{% schema %}
+{
+  "name": "t:general.related_products",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:labels.heading",
+      "info": "t:info.default_text"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "t:labels.collection",
+      "info": "t:info.related_collection"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "label": "t:labels.products_to_show",
+      "default": 4
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "t:labels.color_scheme",
+      "options": [
+        { "value": "default", "label": "t:options.color_scheme.default" },
+        { "value": "secondary", "label": "t:options.color_scheme.secondary" },
+        { "value": "inverse", "label": "t:options.color_scheme.inverse" }
+      ],
+      "default": "secondary"
+    }
+  ]
+}
+{% endschema %}

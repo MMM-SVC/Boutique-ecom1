@@ -1,0 +1,21 @@
+{% doc %}
+  Renders a 5-star rating with an accessible label.
+
+  @param {number} rating - Rating from 0 to 5.
+
+  @example
+  {% render 'stars', rating: 4 %}
+{% enddoc %}
+
+<span class="stars" role="img" aria-label="{{ 'reviews.rating' | t: rating: rating }}">
+  {%- for i in (1..5) -%}
+    <svg
+      class="star {% if i > rating %}star--empty{% endif %}"
+      viewBox="0 0 20 20"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path fill="currentColor" d="m10 1.5 2.6 5.5 6 .7-4.4 4.1 1.1 6-5.3-3-5.3 3 1.1-6L1.4 7.7l6-.7z"/>
+    </svg>
+  {%- endfor -%}
+</span>

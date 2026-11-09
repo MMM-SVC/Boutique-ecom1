@@ -1,0 +1,165 @@
+{% doc %}
+  Reassurance band with three short promises (icon, title, text), e.g.
+  natural ingredients, free shipping, cruelty-free. Each item is editable;
+  empty fields fall back to translated defaults.
+
+  @param {string} [content] - Optional extra markup rendered inside the block. Usually left empty.
+
+  @example
+  {% block 'features' %}{% endblock %}
+{% enddoc %}
+
+{%- liquid
+  assign title_1 = 'home.features.title_1' | t
+  assign text_1 = 'home.features.text_1' | t
+  assign title_2 = 'home.features.title_2' | t
+  assign text_2 = 'home.features.text_2' | t
+  assign title_3 = 'home.features.title_3' | t
+  assign text_3 = 'home.features.text_3' | t
+
+  if block.settings.title_1 != blank
+    assign title_1 = block.settings.title_1
+  endif
+  if block.settings.text_1 != blank
+    assign text_1 = block.settings.text_1
+  endif
+  if block.settings.title_2 != blank
+    assign title_2 = block.settings.title_2
+  endif
+  if block.settings.text_2 != blank
+    assign text_2 = block.settings.text_2
+  endif
+  if block.settings.title_3 != blank
+    assign title_3 = block.settings.title_3
+  endif
+  if block.settings.text_3 != blank
+    assign text_3 = block.settings.text_3
+  endif
+-%}
+
+<div class="features band band--{{ block.settings.color_scheme }} full-width" {{ block.shopify_attributes }}>
+  <ul class="features__list">
+    <li class="feature">
+      <span class="feature__icon">{{ block.settings.icon_1 | append: '.svg' | inline_asset_content }}</span>
+      <h2 class="feature__title">{{ title_1 | escape }}</h2>
+      <p>{{ text_1 | escape }}</p>
+    </li>
+    <li class="feature">
+      <span class="feature__icon">{{ block.settings.icon_2 | append: '.svg' | inline_asset_content }}</span>
+      <h2 class="feature__title">{{ title_2 | escape }}</h2>
+      <p>{{ text_2 | escape }}</p>
+    </li>
+    <li class="feature">
+      <span class="feature__icon">{{ block.settings.icon_3 | append: '.svg' | inline_asset_content }}</span>
+      <h2 class="feature__title">{{ title_3 | escape }}</h2>
+      <p>{{ text_3 | escape }}</p>
+    </li>
+  </ul>
+  {{ content }}
+</div>
+
+{% schema %}
+{
+  "name": "t:general.features",
+  "settings": [
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "t:labels.color_scheme",
+      "options": [
+        { "value": "default", "label": "t:options.color_scheme.default" },
+        { "value": "secondary", "label": "t:options.color_scheme.secondary" },
+        { "value": "inverse", "label": "t:options.color_scheme.inverse" }
+      ],
+      "default": "secondary"
+    },
+    {
+      "type": "header",
+      "content": "t:general.item_1"
+    },
+    {
+      "type": "select",
+      "id": "icon_1",
+      "label": "t:labels.icon",
+      "options": [
+        { "value": "icon-leaf", "label": "t:options.icon.leaf" },
+        { "value": "icon-truck", "label": "t:options.icon.truck" },
+        { "value": "icon-heart", "label": "t:options.icon.heart" },
+        { "value": "icon-shield", "label": "t:options.icon.shield" },
+        { "value": "icon-sparkle", "label": "t:options.icon.sparkle" }
+      ],
+      "default": "icon-leaf"
+    },
+    {
+      "type": "text",
+      "id": "title_1",
+      "label": "t:labels.heading",
+      "info": "t:info.default_text"
+    },
+    {
+      "type": "textarea",
+      "id": "text_1",
+      "label": "t:labels.text",
+      "info": "t:info.default_text"
+    },
+    {
+      "type": "header",
+      "content": "t:general.item_2"
+    },
+    {
+      "type": "select",
+      "id": "icon_2",
+      "label": "t:labels.icon",
+      "options": [
+        { "value": "icon-leaf", "label": "t:options.icon.leaf" },
+        { "value": "icon-truck", "label": "t:options.icon.truck" },
+        { "value": "icon-heart", "label": "t:options.icon.heart" },
+        { "value": "icon-shield", "label": "t:options.icon.shield" },
+        { "value": "icon-sparkle", "label": "t:options.icon.sparkle" }
+      ],
+      "default": "icon-heart"
+    },
+    {
+      "type": "text",
+      "id": "title_2",
+      "label": "t:labels.heading",
+      "info": "t:info.default_text"
+    },
+    {
+      "type": "textarea",
+      "id": "text_2",
+      "label": "t:labels.text",
+      "info": "t:info.default_text"
+    },
+    {
+      "type": "header",
+      "content": "t:general.item_3"
+    },
+    {
+      "type": "select",
+      "id": "icon_3",
+      "label": "t:labels.icon",
+      "options": [
+        { "value": "icon-leaf", "label": "t:options.icon.leaf" },
+        { "value": "icon-truck", "label": "t:options.icon.truck" },
+        { "value": "icon-heart", "label": "t:options.icon.heart" },
+        { "value": "icon-shield", "label": "t:options.icon.shield" },
+        { "value": "icon-sparkle", "label": "t:options.icon.sparkle" }
+      ],
+      "default": "icon-truck"
+    },
+    {
+      "type": "text",
+      "id": "title_3",
+      "label": "t:labels.heading",
+      "info": "t:info.default_text"
+    },
+    {
+      "type": "textarea",
+      "id": "text_3",
+      "label": "t:labels.text",
+      "info": "t:info.default_text"
+    }
+  ]
+}
+{% endschema %}

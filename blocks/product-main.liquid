@@ -1,0 +1,293 @@
+{% doc %}
+  Main product area: media gallery (swipeable on mobile, stacked on desktop),
+  vendor, title, price, variant picker, quantity selector, add-to-cart and
+  dynamic checkout buttons, reassurance line and accordions (description,
+  ingredients metafield, usage, shipping). Must be rendered on the product
+  template. Self-contained: callers must leave the body empty.
+
+  @param {string} [content] - Optional extra markup rendered inside the block. Usually left empty.
+
+  @example
+  {% block 'product-main' %}{% endblock %}
+{% enddoc %}
+
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign form_id = 'ProductForm-' | append: product.id
+
+  assign usage = 'products.usage_default' | t | escape | prepend: '<p>' | append: '</p>'
+  if block.settings.usage != blank
+    assign usage = block.settings.usage
+  endif
+
+  assign shipping = 'products.shipping_default' | t | escape | prepend: '<p>' | append: '</p>'
+  if block.settings.shipping != blank
+    assign shipping = block.settings.shipping
+  endif
+
+  assign ingredients = product.metafields.custom.ingredients
+-%}
+
+<div class="product" data-product {{ block.shopify_attributes }}>
+  <div class="product__media">
+    {% if product.media.size > 0 %}
+      <ul class="product-gallery" aria-label="{{ 'products.gallery' | t }}">
+        {% for media in product.media %}
+          {%- liquid
+            assign loading = 'lazy'
+            if forloop.first
+              assign loading = 'eager'
+            endif
+          -%}
+          <li class="product-gallery__item">
+            {% case media.media_type %}
+              {% when 'image' %}
+                {{
+                  media
+                  | image_url: width: 1800
+                  | image_tag:
+                    loading: loading,
+                    widths: '500, 750, 1000, 1400, 1800',
+                    sizes: '(min-width: 990px) 55vw, 100vw',
+                    alt: media.alt
+                }}
+              {% when 'video', 'external_video' %}
+                {{ media | media_tag: image_size: '1800x' }}
+              {% else %}
+                {{ media.preview_image | image_url: width: 1800 | image_tag: loading: loading, alt: media.alt }}
+            {% endcase %}
+          </li>
+        {% endfor %}
+      </ul>
+      {% if product.media.size > 1 %}
+        <p class="product-gallery__hint">{{ 'products.swipe_hint' | t: count: product.media.size }}</p>
+      {% endif %}
+    {% else %}
+      <div class="product-gallery__item">
+        {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="product__info">
+    <div class="product__sticky">
+      {% if block.settings.show_vendor and product.vendor != blank %}
+        <p class="eyebrow">{{ product.vendor | escape }}</p>
+      {% endif %}
+
+      <h1 class="product__title">{{ product.title | escape }}</h1>
+
+      <div data-price>
+        {% render 'price', variant: current_variant, class: 'price--large' %}
+      </div>
+      <p class="product__tax">{{ 'products.tax_included' | t }}</p>
+
+      {% form 'product', product, id: form_id, class: 'product-form', novalidate: 'novalidate' %}
+        {% unless product.has_only_default_variant %}
+          <div class="variant-picker" data-variant-picker hidden>
+            {% for option in product.options_with_values %}
+              <fieldset class="variant-picker__option">
+                <legend>
+                  {{ option.name | escape }}
+                  <span class="variant-picker__selected" data-selected-value>{{ option.selected_value | escape }}</span>
+                </legend>
+                <div class="variant-picker__values">
+                  {% for value in option.values %}
+                    <label class="pill">
+                      <input
+                        type="radio"
+                        name="option-{{ forloop.parentloop.index0 }}"
+                        value="{{ value | escape }}"
+                        data-option-index="{{ forloop.parentloop.index0 }}"
+                        {% if option.selected_value == value %}
+                          checked
+                        {% endif %}
+                      >
+                      <span>{{ value | escape }}</span>
+                    </label>
+                  {% endfor %}
+                </div>
+              </fieldset>
+            {% endfor %}
+          </div>
+        {% endunless %}
+
+        <div class="field {% if product.has_only_default_variant %}visually-hidden{% endif %}" data-variant-select-wrapper>
+          <label for="VariantSelect-{{ product.id }}">{{ 'products.variant' | t }}</label>
+          <select id="VariantSelect-{{ product.id }}" name="id" data-variant-select>
+            {% for variant in product.variants %}
+              <option
+                value="{{ variant.id }}"
+                {% if variant == current_variant %}
+                  selected
+                {% endif %}
+                {% unless variant.available %}
+                  disabled
+                {% endunless %}
+              >
+                {{ variant.title | escape }} – {{ variant.price | money }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        {% if block.settings.show_quantity %}
+          <div class="field">
+            <label for="Quantity-{{ product.id }}">{{ 'products.quantity' | t }}</label>
+            <div class="quantity" data-quantity>
+              <button type="button" class="quantity__button" data-quantity-minus aria-label="{{ 'products.decrease' | t }}">−</button>
+              <input id="Quantity-{{ product.id }}" type="number" name="quantity" min="1" value="1" inputmode="numeric">
+              <button type="button" class="quantity__button" data-quantity-plus aria-label="{{ 'products.increase' | t }}">+</button>
+            </div>
+          </div>
+        {% endif %}
+
+        <div class="product-form__buttons">
+          <button
+            type="submit"
+            name="add"
+            class="button button--full"
+            data-add-to-cart
+            {% unless current_variant.available %}
+              disabled
+            {% endunless %}
+          >
+            {%- if current_variant.available -%}
+              {{ 'products.add_to_cart' | t }}
+            {%- else -%}
+              {{ 'products.sold_out' | t }}
+            {%- endif -%}
+          </button>
+          {% if block.settings.show_dynamic_checkout %}
+            {{ form | payment_button }}
+          {% endif %}
+        </div>
+      {% endform %}
+
+      {% if block.settings.show_trust %}
+        <ul class="product__trust">
+          <li>{{ 'icon-truck.svg' | inline_asset_content }} {{ 'products.trust_shipping' | t }}</li>
+          <li>{{ 'icon-shield.svg' | inline_asset_content }} {{ 'products.trust_payment' | t }}</li>
+          <li>{{ 'icon-leaf.svg' | inline_asset_content }} {{ 'products.trust_natural' | t }}</li>
+        </ul>
+      {% endif %}
+
+      {{ content }}
+
+      <div class="product__accordions">
+        {% if product.description != blank %}
+          <details class="accordion" open>
+            <summary class="accordion__summary">
+              <span>{{ 'products.description' | t }}</span>
+              <span class="accordion__icon" aria-hidden="true"></span>
+            </summary>
+            <div class="accordion__content rte">{{ product.description }}</div>
+          </details>
+        {% endif %}
+
+        {% if ingredients != blank %}
+          <details class="accordion">
+            <summary class="accordion__summary">
+              <span>{{ 'products.ingredients' | t }}</span>
+              <span class="accordion__icon" aria-hidden="true"></span>
+            </summary>
+            <div class="accordion__content rte">{{ ingredients | metafield_tag }}</div>
+          </details>
+        {% endif %}
+
+        <details class="accordion">
+          <summary class="accordion__summary">
+            <span>{{ 'products.usage' | t }}</span>
+            <span class="accordion__icon" aria-hidden="true"></span>
+          </summary>
+          <div class="accordion__content rte">{{ usage }}</div>
+        </details>
+
+        <details class="accordion">
+          <summary class="accordion__summary">
+            <span>{{ 'products.shipping' | t }}</span>
+            <span class="accordion__icon" aria-hidden="true"></span>
+          </summary>
+          <div class="accordion__content rte">{{ shipping }}</div>
+        </details>
+      </div>
+    </div>
+  </div>
+
+  <script type="application/json" data-product-json>
+    {
+      "variants": [
+        {%- for variant in product.variants -%}
+          {
+            "id": {{ variant.id | json }},
+            "available": {{ variant.available | json }},
+            "options": {{ variant.options | json }},
+            "priceHtml": {{ variant.price | money | json }},
+            "compareHtml": {% if variant.compare_at_price > variant.price %}{{ variant.compare_at_price | money | json }}{% else %}null{% endif %}
+          }{% unless forloop.last %},{% endunless %}
+        {%- endfor -%}
+      ],
+      "labels": {
+        "addToCart": {{ 'products.add_to_cart' | t | json }},
+        "soldOut": {{ 'products.sold_out' | t | json }},
+        "unavailable": {{ 'products.unavailable' | t | json }},
+        "salePrice": {{ 'products.sale_price' | t | json }},
+        "regularPrice": {{ 'products.regular_price' | t | json }}
+      }
+    }
+  </script>
+</div>
+
+<script src="{{ 'product.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "t:general.product",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "t:labels.show_vendor",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quantity",
+      "label": "t:labels.show_quantity",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dynamic_checkout",
+      "label": "t:labels.show_dynamic_checkout",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust",
+      "label": "t:labels.show_trust",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "t:general.accordions"
+    },
+    {
+      "type": "richtext",
+      "id": "usage",
+      "label": "t:labels.usage",
+      "info": "t:info.default_text"
+    },
+    {
+      "type": "richtext",
+      "id": "shipping",
+      "label": "t:labels.shipping",
+      "info": "t:info.default_text"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:info.ingredients_metafield"
+    }
+  ]
+}
+{% endschema %}

@@ -1,25 +1,137 @@
-{% block 'container' %}
-  <h1>{{ 'cart.title' | t }}</h1>
+{%- liquid
+  assign threshold = settings.free_shipping_threshold | times: 100
+  assign remaining = threshold | minus: cart.total_price
+  assign remaining_formatted = remaining | money
+  if threshold > 0
+    assign progress = cart.total_price | times: 100 | divided_by: threshold
+    if progress > 100
+      assign progress = 100
+    endif
+  endif
+-%}
 
-  <form action="{{ routes.cart_url }}" method="post">
-    <table>
-      {% for item in cart.items %}
-        <tr>
-          <td>
-            {% render 'image', image: item.image, url: item.url %}
-          </td>
-          <td>
-            <p>{{ item.product.title }}</p>
-            {{ 'cart.remove' | t | link_to: item.url_to_remove }}
-          </td>
-          <td>
-            <input type="text" name="updates[]" value="{{ item.quantity }}">
-            <input type="submit" value="{{ 'cart.update' | t }}">
-          </td>
-        </tr>
-      {% endfor %}
-    </table>
+{% block 'container', class: 'page-section' %}
+  <div class="page-header">
+    <h1>{{ 'cart.title' | t }}</h1>
+  </div>
 
-    <input type="submit" name="checkout" value="{{ 'cart.checkout' | t }}">
-  </form>
+  {% if cart.item_count == 0 %}
+    <div class="cart-empty">
+      <p>{{ 'cart.empty' | t }}</p>
+      <a class="button" href="{{ routes.all_products_collection_url }}">{{ 'cart.continue_shopping' | t }}</a>
+    </div>
+  {% else %}
+    {% if threshold > 0 %}
+      <div class="shipping-progress">
+        <p>
+          {% if remaining > 0 %}
+            {{ 'cart.free_shipping_remaining_html' | t: amount: remaining_formatted }}
+          {% else %}
+            {{ 'cart.free_shipping_reached' | t }}
+          {% endif %}
+        </p>
+        <div
+          class="shipping-progress__bar"
+          role="progressbar"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow="{{ progress }}"
+          aria-label="{{ 'cart.free_shipping_progress' | t }}"
+        >
+          <span style="width: {{ progress }}%;"></span>
+        </div>
+      </div>
+    {% endif %}
+
+    <form action="{{ routes.cart_url }}" method="post" class="cart" data-cart-form novalidate>
+      <ul class="cart__items" aria-label="{{ 'cart.items' | t }}">
+        {% for item in cart.items %}
+          <li class="cart-item">
+            <a class="cart-item__media" href="{{ item.url }}" tabindex="-1" aria-hidden="true">
+              {% if item.image %}
+                {{ item.image | image_url: width: 300 | image_tag: loading: 'lazy', widths: '150, 300', sizes: '120px', alt: '' }}
+              {% else %}
+                {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+              {% endif %}
+            </a>
+
+            <div class="cart-item__details">
+              <a class="cart-item__title" href="{{ item.url }}">{{ item.product.title | escape }}</a>
+              {% unless item.product.has_only_default_variant %}
+                <p class="cart-item__variant">{{ item.variant.title | escape }}</p>
+              {% endunless %}
+              {% for property in item.properties %}
+                {% unless property.last == blank or property.first contains '_' %}
+                  <p class="cart-item__variant">{{ property.first | escape }} : {{ property.last | escape }}</p>
+                {% endunless %}
+              {% endfor %}
+              <p class="cart-item__unit-price">{{ item.final_price | money }}</p>
+              {% for discount in item.line_level_discount_allocations %}
+                <p class="cart-item__discount">{{ discount.discount_application.title | escape }} (−{{ discount.amount | money }})</p>
+              {% endfor %}
+
+              <div class="cart-item__actions">
+                <div class="quantity quantity--small" data-quantity>
+                  <button type="button" class="quantity__button" data-quantity-minus aria-label="{{ 'products.decrease' | t }}">−</button>
+                  <label class="visually-hidden" for="Quantity-{{ item.key }}">
+                    {{- 'cart.quantity_for' | t: title: item.product.title -}}
+                  </label>
+                  <input
+                    id="Quantity-{{ item.key }}"
+                    type="number"
+                    name="updates[]"
+                    value="{{ item.quantity }}"
+                    min="0"
+                    inputmode="numeric"
+                  >
+                  <button type="button" class="quantity__button" data-quantity-plus aria-label="{{ 'products.increase' | t }}">+</button>
+                </div>
+                <a class="link link--muted" href="{{ item.url_to_remove }}">{{ 'cart.remove' | t }}</a>
+              </div>
+            </div>
+
+            <p class="cart-item__total">{{ item.final_line_price | money }}</p>
+          </li>
+        {% endfor %}
+      </ul>
+
+      <aside class="cart__summary">
+        <h2 class="cart__summary-title">{{ 'cart.summary' | t }}</h2>
+
+        {% for discount in cart.cart_level_discount_applications %}
+          <p class="cart__row">
+            <span>{{ discount.title | escape }}</span>
+            <span>−{{ discount.total_allocated_amount | money }}</span>
+          </p>
+        {% endfor %}
+
+        <p class="cart__row cart__row--total">
+          <span>{{ 'cart.subtotal' | t }}</span>
+          <span>{{ cart.total_price | money_with_currency }}</span>
+        </p>
+        <p class="cart__taxes">{{ 'cart.taxes_and_shipping' | t }}</p>
+
+        {% if settings.show_cart_note %}
+          <div class="field">
+            <label for="CartNote">{{ 'cart.note' | t }}</label>
+            <textarea id="CartNote" name="note" rows="3">{{ cart.note }}</textarea>
+          </div>
+        {% endif %}
+
+        <button type="submit" name="checkout" class="button button--full">{{ 'cart.checkout' | t }}</button>
+        <button type="submit" name="update" class="button button--outline button--full" data-cart-update>
+          {{- 'cart.update' | t -}}
+        </button>
+
+        <ul class="cart__trust">
+          <li>{{ 'icon-shield.svg' | inline_asset_content }} {{ 'products.trust_payment' | t }}</li>
+          <li>{{ 'icon-truck.svg' | inline_asset_content }} {{ 'products.trust_shipping' | t }}</li>
+        </ul>
+
+        <a class="link cart__continue" href="{{ routes.all_products_collection_url }}">{{ 'cart.continue_shopping' | t }}</a>
+      </aside>
+    </form>
+
+    <script src="{{ 'cart.js' | asset_url }}" defer></script>
+  {% endif %}
 {% endblock %}
